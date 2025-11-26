@@ -1,53 +1,36 @@
-🔋 HAR-ARIMA Based Hourly Electricity Load Forecasting
+🔋 HAR-ARIMA Energy Load Forecasting
+📌 Project Overview
 
-A Multi-Scale Statistical Modeling Framework for Real-World Power Systems
+This project implements a properly structured HAR-ARIMA model to forecast hourly electricity demand using PJM Interconnection data. Energy consumption naturally follows three time scales—hourly, daily, and weekly—and the HAR framework models these patterns using hierarchical lags rather than simple exogenous inputs. This structured approach improved forecasting accuracy by approximately 10%.
 
-📌 Introduction
+🧠 HAR-ARIMA Methodology
 
-This repository presents an enhanced implementation of the HAR-ARIMA (Heterogeneous Autoregressive ARIMA) model for forecasting hourly electricity demand using real PJM Interconnection data. Electricity consumption exhibits multi-scale behavior—hourly fluctuations, daily diurnal cycles, and weekly business patterns—requiring a model capable of integrating all three. HAR-ARIMA accomplishes this by embedding hierarchical lag components directly into the AR structure, enabling transparent and interpretable forecasting.
+The model uses three hierarchical components:
 
-🧠 Model Design & Methodology
-Hierarchical Lag Components
+θ₁ (Lag-1): Captures short-term hourly continuity
 
-The HAR model decomposes memory into three features that represent different time horizons:
+θ₂ (24-hour mean): Represents daily diurnal cycles
 
-θ₁: Short-Term (Lag-1)
-Captures immediate hourly inertia and short-term consumption continuity.
+θ₃ (168-hour mean): Models weekly business cycles
 
-θ₂: Medium-Term (24-Hour Mean)
-Models diurnal behavior such as daytime peaks and nighttime drop-offs.
+These components are inserted directly into the AR structure, consistent with HAR literature.
 
-θ₃: Long-Term (168-Hour Mean)
-Represents weekly rhythm driven by weekday and weekend patterns.
+🔹 Final HAR-ARIMA Configuration
 
-These components are embedded inside the ARIMA formulation—not treated as independent exogenous variables—ensuring the model aligns with HAR theory and improving predictive accuracy by approximately 10%.
+ARIMA Orders: Selected using ACF, PACF, and AIC/BIC analysis
 
-⚙️ Model Configuration
+Final Model: (p, d, q) values adjusted based on dataset behavior – include your actual numbers)
 
-ARIMA and SARIMA orders were selected through:
+Estimated Coefficients: θ₁, θ₂, θ₃ learned directly from data
 
-ACF/PACF diagnostics
+📊 Model Comparison
 
-AIC/BIC information criteria
+SARIMA: Seasonal orders chosen after examining long-period seasonal spikes (24h, 168h). Struggled with weekly seasonality.
 
-Residual analysis
+XGBoost: Required multiple engineered lags and Fourier terms; HAR-ARIMA matched accuracy with fewer features.
 
-A structured model summary is included in the notebook, detailing p, d, q values, estimated HAR coefficients, and residual checks.
+HAR-ARIMA: Delivered more stable, interpretable predictions and reduced training complexity.
 
-📊 Comparative Evaluation
+📥 Data Source & Lag Rationale
 
-The forecasting performance is evaluated against SARIMA and XGBoost:
-
-SARIMA: Limited by long seasonal periods (24h × 7), slower to adapt to sudden shifts.
-
-XGBoost: Strong accuracy but required heavy feature engineering (Fourier terms, multiple seasonal lags).
-
-HAR-ARIMA: Achieved the best trade-off—lightweight, fast training, interpretable, and accurate across hourly, daily, and weekly cycles.
-
-📥 Data Source & Rationale
-
-PJM hourly load data displays strong periodicity at 1, 24, and 168 hours, directly motivating the chosen hierarchical structure.
-
-✅ Conclusion
-
-By integrating multi-scale memory into a unified ARIMA framework, this project provides a robust, interpretable, and production-ready solution for electricity demand forecasting.
+The PJM dataset exhibits strong 1-hour, 24-hour, and 168-hour periodicity. These lags correspond to physical energy-use behavior: immediate inertia, daily routines, and weekly work–leisure cycles. This forms the theoretical basis for the HAR structure.
